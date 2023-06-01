@@ -41,7 +41,7 @@ app.get('/users/:userId', (req, res) => {
 app.post('/users', (req, res) => {
     const body = req.body
 
-    if (body.name.length > 3 && body.age > -1) {
+    if (body.name.length > 3 && body.age > -1 && typeof body.status === "boolean") {
         users.push(body)
         const usersStringify = JSON.stringify(users);
         fs.writeFile(pathJoin, usersStringify, (err) => {
@@ -52,7 +52,7 @@ app.post('/users', (req, res) => {
         })
     } else {
         res.status(404).json({
-            message: 'імя повинно бути більше 3 символів, вік – не менше нуля'
+            message: 'імя повинно бути більше 3 символів, вік – не менше нуля та status - boolean'
         })
     }
 })
