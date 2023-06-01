@@ -61,7 +61,7 @@ app.put('/users/:userId', (req, res) => {
     const {userId} = req.params;
     users[+userId - 1] = req.body;
     console.log(req.body)
-    if (+userId > users.length) {
+    if (+userId > users.length || +userId<1) {
         res.status(404).json({
             message: 'юзер з таким id відсутній'
         })
@@ -79,7 +79,7 @@ app.put('/users/:userId', (req, res) => {
 
 app.delete('/users/:userId', (req, res) => {
     const {userId} = req.params;
-    if (+userId > users.length) {
+    if (+userId > users.length || +userId<1) {
         res.status(404).json({
             message: 'юзер з таким id відсутній'
         })
