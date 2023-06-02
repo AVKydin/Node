@@ -57,6 +57,7 @@ app.post('/users', (req, res) => {
     }
 })
 
+
 app.put('/users/:userId', (req, res) => {
     const {userId} = req.params;
     users[+userId - 1] = req.body;
