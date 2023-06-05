@@ -8,7 +8,9 @@ import fs from "node:fs";
 import path from "node:path";
 
 import express, { Request, Response } from "express";
+import * as mongoose from "mongoose";
 
+import { configs } from "./configs/config";
 import { users } from "./users";
 
 const app = express();
@@ -108,8 +110,8 @@ app.get("/welcome", (req: Request, res: Response) => {
   // res.end();
 });
 
-const PORT = 5100;
 
-app.listen(PORT, () => {
+app.listen(configs.PORT, () => {
+  mongoose.connect(configs.DB_URL);
   console.log("Server OK ");
 });
