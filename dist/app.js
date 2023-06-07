@@ -26,90 +26,58 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const node_fs_1 = __importDefault(require("node:fs"));
-const node_path_1 = __importDefault(require("node:path"));
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
 const config_1 = require("./configs/config");
-const users_1 = require("./users");
+const user_model_1 = require("./models/user.model");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-const pathJoin = node_path_1.default.join("users.json");
-app.get("/users", (req, res) => {
-    res.json(users_1.users);
-});
-app.get("/users/:userId", (req, res) => {
-    const { userId } = req.params;
-    const user = users_1.users[+userId - 1];
-    if (!user) {
-        res.status(404).json({
-            message: "юзер з таким id відсутній",
-        });
+app.get("/users", async (req, res) => {
+    try {
+        const users = await user_model_1.User.find();
+        return res.json(users);
     }
-    else {
-        res.status(200).json(user);
+    catch (e) {
+        console.log(e);
     }
 });
-app.post("/users", (req, res) => {
-    const body = req.body;
-    if (body.name.length > 3 &&
-        body.age > -1 &&
-        typeof body.status === "boolean") {
-        users_1.users.push(body);
-        const usersStringify = JSON.stringify(users_1.users);
-        node_fs_1.default.writeFile(pathJoin, usersStringify, (err) => {
-            if (err)
-                throw new Error(err.message);
-        });
-        res.status(201).json({
-            message: "User created!",
-        });
+app.get("/users/:userId", async (req, res) => {
+    try {
+        const user = await user_model_1.User.findById(req.params.userId);
+        return res.json(user);
     }
-    else {
-        res.status(404).json({
-            message: "імя повинно бути більше 3 символів, вік – не менше нуля та status - boolean",
-        });
+    catch (e) {
+        console.log(e);
     }
 });
-app.put("/users/:userId", (req, res) => {
-    const { userId } = req.params;
-    users_1.users[+userId - 1] = req.body;
-    console.log(req.body);
-    if (+userId > users_1.users.length || +userId < 1) {
-        res.status(404).json({
-            message: "юзер з таким id відсутній",
-        });
+app.post("/users", async (req, res) => {
+    try {
+        const createdUser = await user_model_1.User.create(req.body);
+        return res.status(201).json(createdUser);
     }
-    else {
-        const usersStringify = JSON.stringify(users_1.users);
-        node_fs_1.default.writeFile(pathJoin, usersStringify, (err) => {
-            if (err)
-                throw new Error(err.message);
-        });
-        res.status(200).json({
-            message: "User updated!",
-            data: users_1.users[+userId],
-        });
+    catch (e) {
+        console.log(e);
     }
 });
-app.delete("/users/:userId", (req, res) => {
-    const { userId } = req.params;
-    if (+userId > users_1.users.length || +userId < 1) {
-        res.status(404).json({
-            message: "юзер з таким id відсутній",
-        });
+app.put("/users/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const updatedUser = await user_model_1.User.findOneAndUpdate({ _id: userId }, { ...req.body }, { returnDocument: "after" });
+        return res.status(200).json(updatedUser);
     }
-    else {
-        users_1.users.splice(+userId - 1, 1);
-        const usersStringify = JSON.stringify(users_1.users);
-        node_fs_1.default.writeFile(pathJoin, usersStringify, (err) => {
-            if (err)
-                throw new Error(err.message);
-        });
-        res.status(200).json({
-            message: "User deleted!",
-        });
+    catch (e) {
+        console.log(e);
+    }
+});
+app.delete("/users/:userId", async (req, res) => {
+    try {
+        const { userId } = req.params;
+        await user_model_1.User.deleteOne({ _id: userId });
+        return res.sendStatus(200);
+    }
+    catch (e) {
+        console.log(e);
     }
 });
 app.get("/welcome", (req, res) => {

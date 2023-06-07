@@ -1,9 +1,37 @@
 import { model, Schema } from "mongoose";
 
-const userSchema = new Schema({
-  name: {},
-  age: {},
-  gender: {},
-  email: {},
-  password: {},
-});
+import { EGenders } from "../enums/User.enum";
+
+const userSchema = new Schema(
+  {
+    name: {
+      type: String,
+    },
+    age: {
+      type: Number,
+      nim: [1, "Minimum 1"],
+      max: [130, "Maximum 130"],
+    },
+    gender: {
+      type: String,
+      enum: EGenders,
+    },
+    email: {
+      type: String,
+      trim: true,
+      required: true,
+      lowercase: true,
+      unique: true,
+    },
+    password: {
+      type: String,
+      trim: true,
+    },
+  },
+  {
+    versionKey: false,
+    timestamps: true,
+  }
+);
+
+export const User = model("user", userSchema);
