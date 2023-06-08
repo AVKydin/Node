@@ -29,60 +29,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
 const config_1 = require("./configs/config");
-const user_model_1 = require("./models/user.model");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.get("/users", async (req, res) => {
-    try {
-        const users = await user_model_1.User.find();
-        return res.json(users);
-    }
-    catch (e) {
-        console.log(e);
-    }
-});
-app.get("/users/:userId", async (req, res) => {
-    try {
-        const user = await user_model_1.User.findById(req.params.userId);
-        return res.json(user);
-    }
-    catch (e) {
-        console.log(e);
-    }
-});
-app.post("/users", async (req, res) => {
-    try {
-        const createdUser = await user_model_1.User.create(req.body);
-        return res.status(201).json(createdUser);
-    }
-    catch (e) {
-        console.log(e);
-    }
-});
-app.put("/users/:userId", async (req, res) => {
-    try {
-        const { userId } = req.params;
-        const updatedUser = await user_model_1.User.findOneAndUpdate({ _id: userId }, { ...req.body }, { returnDocument: "after" });
-        return res.status(200).json(updatedUser);
-    }
-    catch (e) {
-        console.log(e);
-    }
-});
-app.delete("/users/:userId", async (req, res) => {
-    try {
-        const { userId } = req.params;
-        await user_model_1.User.deleteOne({ _id: userId });
-        return res.sendStatus(200);
-    }
-    catch (e) {
-        console.log(e);
-    }
-});
-app.get("/welcome", (req, res) => {
-    console.log("WELCOME!!!");
-    res.send("WELCOME!!!");
+app.use((error, req, res, next) => {
+    const status = error.status || 500;
+    return res.status(status).json(error.message);
 });
 app.listen(config_1.configs.PORT, () => {
     mongoose.connect(config_1.configs.DB_URL);
