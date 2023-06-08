@@ -29,14 +29,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
 const config_1 = require("./configs/config");
+const user_router_1 = require("./routers/user.router");
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
-app.use((error, req, res, next) => {
-    const status = error.status || 500;
-    return res.status(status).json(error.message);
+app.use("/users", user_router_1.userRouter);
+app.use((err, req, res, next) => {
+    const status = err.status || 500;
+    return res.status(status).json({
+        message: err.message,
+        status: err.status,
+    });
 });
 app.listen(config_1.configs.PORT, () => {
     mongoose.connect(config_1.configs.DB_URL);
-    console.log("Server OK ");
+    console.log(`Server has started on PORT ${config_1.configs.PORT}  🥸`);
 });
