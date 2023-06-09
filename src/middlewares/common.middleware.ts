@@ -1,24 +1,39 @@
 import { NextFunction, Request, Response } from "express";
+import { ObjectSchema } from "joi";
 import { isObjectIdOrHexString } from "mongoose";
 
 import { ApiError } from "../errors/api.error";
 
 class CommonMiddleware {
-  public isIdValid(req: Request, res: Response, next: NextFunction) {
-    try {
-      const { userId } = req.params;
+  public isIdValid(field: string) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const id = req.params[field];
 
-      if (!isObjectIdOrHexString(userId)) {
-        throw new ApiError("Id not valid", 400);
+        if (!isObjectIdOrHexString(id)) {
+          throw new ApiError(`${field} not valid`, 400);
+        }
+
+        next();
+      } catch (e) {
+        next(e);
       }
-
-      next();
-    } catch (e) {
-      next(e);
-    }
+    };
   }
+  public isBodyValid(validator: ObjectSchema) {
+    return (req: Request, res: Response, next: NextFunction) => {
+      try {
+        const { error, value } = validator.validate(req.body);
 
-  public async isMongoIdValid() {}
+        if (error) {
+          throw new ApiError(error.message, 400);
+        }
+        req.body = value;
+        next();
+      } catch (e) {
+        next(e);
+      }
+    };
+  }
 }
-
 export const commonMiddleware = new CommonMiddleware();

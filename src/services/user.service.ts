@@ -1,9 +1,10 @@
+import { ApiError } from "../errors/api.error";
 import { User } from "../models/user.model";
 import { IUser } from "../types/user.type";
 
 class UserService {
   public async findAll(): Promise<IUser[]> {
-    return await User.find().select("-password");
+    return await User.find();
   }
 
   public async create(data: IUser): Promise<IUser> {
@@ -11,19 +12,30 @@ class UserService {
   }
 
   public async findById(userId: string): Promise<IUser> {
-    return await User.findById(userId);
+    return await this.getOneByIdOrThrow(userId);
+  }
+  public async updateById(userId: string, dto: Partial<IUser>): Promise<IUser> {
+    await this.getOneByIdOrThrow(userId);
+
+    return await User.findOneAndUpdate(
+      { _id: userId },
+      { ...dto },
+      { returnDocument: "after" }
+    );
+  }
+  public async deleteById(userId: string): Promise<void> {
+    await this.getOneByIdOrThrow(userId);
+
+    await User.deleteOne({ _id: userId });
   }
 
-  // public async findOneAndUpdate({ _id: userId }:string,
-  //                               { ...value },
-  //                               { returnDocument: "after" }){
-  //   return User.findOneAndUpdate()
-  //
-  // }
-
-  // public async deleteOne({ _id: userId }): Promise<IUser> {
-  //   return User.deleteOne({_id});
-  // }
+  private async getOneByIdOrThrow(userId: string): Promise<IUser> {
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new ApiError("User not found", 422);
+    }
+    return user;
+  }
 }
 
 export const userService = new UserService();
