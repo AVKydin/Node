@@ -9,6 +9,7 @@ import * as mongoose from "mongoose";
 
 import { configs } from "./configs/config";
 import { ApiError } from "./errors/api.error";
+import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
 
 const app = express();
@@ -17,6 +18,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/users", userRouter);
+app.use("/auth", authRouter);
+
 app.use((err: ApiError, req: Request, res: Response, next: NextFunction) => {
   const status = err.status || 500;
   return res.status(status).json({
@@ -24,12 +27,6 @@ app.use((err: ApiError, req: Request, res: Response, next: NextFunction) => {
     status: err.status,
   });
 });
-
-// app.get("/welcome", (req: Request, res: Response) => {
-//   console.log("WELCOME!!!");
-//   res.send("WELCOME!!!");
-//   // res.end();
-// });
 
 app.listen(configs.PORT, () => {
   mongoose.connect(configs.DB_URL);
