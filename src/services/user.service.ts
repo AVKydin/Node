@@ -1,5 +1,6 @@
 import { ApiError } from "../errors/api.error";
 import { User } from "../models/User.model";
+import { userRepository } from "../repositories/user.repository";
 import { IUser } from "../types/user.type";
 
 class UserService {
@@ -8,12 +9,13 @@ class UserService {
   }
 
   public async create(data: IUser): Promise<IUser> {
-    return await User.create({ ...data });
+    return await userRepository.create(data);
   }
 
-  public async findById(userId: string): Promise<IUser> {
-    return await this.getOneByIdOrThrow(userId);
+  public async findById(id: string): Promise<IUser> {
+    return await this.getOneByIdOrThrow(id);
   }
+
   public async updateById(userId: string, dto: Partial<IUser>): Promise<IUser> {
     await this.getOneByIdOrThrow(userId);
 
@@ -23,6 +25,7 @@ class UserService {
       { returnDocument: "after" }
     );
   }
+
   public async deleteById(userId: string): Promise<void> {
     await this.getOneByIdOrThrow(userId);
 

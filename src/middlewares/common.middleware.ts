@@ -11,7 +11,7 @@ class CommonMiddleware {
         const id = req.params[field];
 
         if (!isObjectIdOrHexString(id)) {
-          throw new ApiError(`${field} not valid`, 400);
+          throw new ApiError(`Id ${field} not valid`, 400);
         }
 
         next();
@@ -20,14 +20,15 @@ class CommonMiddleware {
       }
     };
   }
+
   public isBodyValid(validator: ObjectSchema) {
     return (req: Request, res: Response, next: NextFunction) => {
       try {
         const { error, value } = validator.validate(req.body);
-
         if (error) {
           throw new ApiError(error.message, 400);
         }
+
         req.body = value;
         next();
       } catch (e) {
@@ -36,4 +37,5 @@ class CommonMiddleware {
     };
   }
 }
+
 export const commonMiddleware = new CommonMiddleware();

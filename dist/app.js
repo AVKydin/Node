@@ -45,5 +45,5 @@ app.use((err, req, res, next) => {
 });
 app.listen(config_1.configs.PORT, () => {
     mongoose.connect(config_1.configs.DB_URL);
-    console.log(`Server has started on PORT ${config_1.configs.PORT}  🥸`);
+    console.log(`Server has started on PORT ${config_1.configs.PORT} 🥸`);
 });
