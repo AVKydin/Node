@@ -5,6 +5,7 @@ import { configs } from "./configs/config";
 import { ApiError } from "./errors/api.error";
 import { authRouter } from "./routers/auth.router";
 import { userRouter } from "./routers/user.router";
+import {cronRunner} from "./crons";
 
 const app = express();
 
@@ -27,5 +28,6 @@ app.use((err: ApiError, req: Request, res: Response, next: NextFunction) => {
 
 app.listen(configs.PORT, () => {
   mongoose.connect(configs.DB_URL);
+  cronRunner();
   console.log(`Server has started on PORT ${configs.PORT} 🥸`);
 });
