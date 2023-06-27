@@ -1,0 +1,73 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "description": "AVK swagger",
+    "version": "1.0.0",
+    "title": "Swagger AVK",
+    "contact": {
+      "email": "api@swagger.io"
+    }
+  },
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": ["users"],
+        "description": "get all users",
+        "produces": ["application/json"],
+        "summary": "get all users summary",
+        "responses": {
+          "200": {
+            "description": "Returned array of users"
+          }
+        }
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "tags": ["users"],
+        "description": "get user by id",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "userId",
+            "description": "ID of user to return ",
+            "required": true,
+            "type": "string"
+
+          },
+          {
+          "in": "header",
+          "name": "Authorization",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "default": "dsfgcvxlbvlxkvbc"
+          }
+        }],
+        "responses": {
+          "200": {
+            "description": "Returned user",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+            }
+          }
+        }
+      }
+    },
+    "definitions": {
+      "User": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "isActivated": {
+            "type": "boolean"
+          },
+          "age": {
+            "type": "integer"
+          }
+      }
+    }
+  }
+}

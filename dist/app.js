@@ -28,15 +28,18 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const mongoose = __importStar(require("mongoose"));
+const swaggerUI = __importStar(require("swagger-ui-express"));
 const config_1 = require("./configs/config");
+const crons_1 = require("./crons");
 const auth_router_1 = require("./routers/auth.router");
 const user_router_1 = require("./routers/user.router");
-const crons_1 = require("./crons");
+const swaggerJson = __importStar(require("./utils/swagger.json"));
 const app = (0, express_1.default)();
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/users", user_router_1.userRouter);
 app.use("/auth", auth_router_1.authRouter);
+app.use("/swagger", swaggerUI.serve, swaggerUI.setup(swaggerJson));
 app.use((err, req, res, next) => {
     const status = err.status || 500;
     return res.status(status).json({
