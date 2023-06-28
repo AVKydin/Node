@@ -1,4 +1,6 @@
+import cors from "cors";
 import express, { NextFunction, Request, Response } from "express";
+import rateLimit, { RateLimitRequestHandler } from "express-rate-limit";
 import * as mongoose from "mongoose";
 import * as swaggerUI from "swagger-ui-express";
 
@@ -11,6 +13,22 @@ import * as swaggerJson from "./utils/swagger.json";
 
 const app = express();
 
+const apiLimiter: RateLimitRequestHandler = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+});
+
+app.use("/*", apiLimiter);
+app.use(
+  cors({
+    origin: "*",
+    methods: "GET, HEAD, PUT, PATCH, POST, DELETE",
+    allowedHeaders: ["Authorization", "Content-Type", "Origin"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,8 +47,8 @@ app.use((err: ApiError, req: Request, res: Response, next: NextFunction) => {
   });
 });
 
-app.listen(configs.PORT, () => {
-  mongoose.connect(configs.DB_URL);
+app.listen(configs.PORT, async () => {
+  await mongoose.connect(configs.DB_URL);
   cronRunner();
   console.log(`Server has started on PORT ${configs.PORT} 🥸`);
 });

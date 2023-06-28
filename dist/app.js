@@ -26,7 +26,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const cors_1 = __importDefault(require("cors"));
 const express_1 = __importDefault(require("express"));
+const express_rate_limit_1 = __importDefault(require("express-rate-limit"));
 const mongoose = __importStar(require("mongoose"));
 const swaggerUI = __importStar(require("swagger-ui-express"));
 const config_1 = require("./configs/config");
@@ -35,6 +37,19 @@ const auth_router_1 = require("./routers/auth.router");
 const user_router_1 = require("./routers/user.router");
 const swaggerJson = __importStar(require("./utils/swagger.json"));
 const app = (0, express_1.default)();
+const apiLimiter = (0, express_rate_limit_1.default)({
+    windowMs: 60 * 1000,
+    max: 10,
+    standardHeaders: true,
+});
+app.use("/*", apiLimiter);
+app.use((0, cors_1.default)({
+    origin: "*",
+    methods: "GET, HEAD, PUT, PATCH, POST, DELETE",
+    allowedHeaders: ["Authorization", "Content-Type", "Origin"],
+    preflightContinue: false,
+    optionsSuccessStatus: 204,
+}));
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use("/users", user_router_1.userRouter);
@@ -47,8 +62,8 @@ app.use((err, req, res, next) => {
         status: err.status,
     });
 });
-app.listen(config_1.configs.PORT, () => {
-    mongoose.connect(config_1.configs.DB_URL);
+app.listen(config_1.configs.PORT, async () => {
+    await mongoose.connect(config_1.configs.DB_URL);
     (0, crons_1.cronRunner)();
     console.log(`Server has started on PORT ${config_1.configs.PORT} 🥸`);
 });
